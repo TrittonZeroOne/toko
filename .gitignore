@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+!.env.supabase.example
+backend/.env
+frontend/.env
