@@ -1,12 +1,7 @@
 package service
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
 	"net/smtp"
 	"os"
 	"strconv"
@@ -28,17 +23,13 @@ func frontendURL() string {
 }
 
 func SendEmail(to, subject, body string) error {
-	if key := strings.TrimSpace(os.Getenv("RESEND_API_KEY")); key != "" {
-		return sendResendEmail(key, to, subject, body)
-	}
 	host := strings.TrimSpace(os.Getenv("SMTP_HOST"))
 	from := strings.TrimSpace(os.Getenv("SMTP_FROM"))
 	if from == "" {
 		from = strings.TrimSpace(os.Getenv("SMTP_USER"))
 	}
 	if host == "" || from == "" {
-		log.Printf("email disabled: to=%s subject=%q body=%q", to, subject, body)
-		return nil
+		return fmt.Errorf("email service not configured: set SMTP_HOST and SMTP_FROM")
 	}
 	port := strings.TrimSpace(os.Getenv("SMTP_PORT"))
 	if port == "" {
@@ -61,42 +52,6 @@ func SendEmail(to, subject, body string) error {
 		auth = smtp.PlainAuth("", user, pass, host)
 	}
 	return smtp.SendMail(addr, auth, from, []string{to}, []byte(msg))
-}
-
-func sendResendEmail(apiKey, to, subject, body string) error {
-	from := strings.TrimSpace(os.Getenv("RESEND_FROM"))
-	if from == "" {
-		from = strings.TrimSpace(os.Getenv("SMTP_FROM"))
-	}
-	if from == "" {
-		from = fmt.Sprintf("%s <onboarding@resend.dev>", appName())
-	}
-	payload := map[string]any{
-		"from":    from,
-		"to":      []string{to},
-		"subject": subject,
-		"text":    body,
-	}
-	b, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-	req, err := http.NewRequest(http.MethodPost, "https://api.resend.com/emails", bytes.NewReader(b))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-	req.Header.Set("Content-Type", "application/json")
-	res, err := (&http.Client{}).Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-	resBody, _ := io.ReadAll(res.Body)
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return fmt.Errorf("resend HTTP %d: %s", res.StatusCode, string(resBody))
-	}
-	return nil
 }
 
 func SendVerificationEmail(to, token string) error {

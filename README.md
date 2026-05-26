@@ -2,6 +2,10 @@
 
 Fullstack toko online: backend **Go Fiber + GORM + JWT**, frontend **React Vite + Tailwind**, pembayaran **Midtrans**, database **MySQL lokal** atau **PostgreSQL/Supabase**.
 
+> 🚀 **Deployment Documentation**: Lihat [VERCEL_SETUP_SUMMARY.md](./VERCEL_SETUP_SUMMARY.md) untuk setup lengkap Vercel & Railway!  
+> 📋 **Checklist**: [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) - Quick reference & troubleshooting  
+> 📚 **Detailed Guide**: [DEPLOYMENT.md](./DEPLOYMENT.md) - Panduan lengkap deployment
+
 ## Struktur Deploy
 
 - **Vercel** dipakai untuk frontend React.

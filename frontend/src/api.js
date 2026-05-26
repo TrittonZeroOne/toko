@@ -1,7 +1,10 @@
-const prefix = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+// Backend API base URL. Set `VITE_API_URL` in frontend/.env when switching to a remote backend.
+// Example: VITE_API_URL=https://toko-production-045b.up.railway.app
+// If empty in dev, requests remain relative and use Vite proxy /api -> backend.
+const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
 export async function api(path, options = {}) {
-  const url = `${prefix}${path}`
+  const url = `${API_URL}${path}`
   const headers = { 'Content-Type': 'application/json', ...options.headers }
   const token = localStorage.getItem('token')
   if (token) headers.Authorization = `Bearer ${token}`

@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"log"
 	"math/big"
 	"strings"
 	"time"
@@ -121,7 +122,10 @@ func (a *AuthController) Register(c *fiber.Ctx) error {
 	}
 	now := time.Now()
 	_ = a.DB.Model(&u).Update("email_verify_sent_at", &now).Error
-	_ = service.SendVerificationEmail(u.Email, u.EmailVerifyToken)
+	if err := service.SendVerificationEmail(u.Email, u.EmailVerifyToken); err != nil {
+		log.Printf("verification email failed for %s: %v", u.Email, err)
+		return fiber.NewError(fiber.StatusBadGateway, "gagal mengirim email verifikasi")
+	}
 	return c.JSON(fiber.Map{
 		"ok":      true,
 		"message": "Akun dibuat. Cek email untuk verifikasi sebelum login.",
@@ -180,6 +184,7 @@ func (a *AuthController) ResendVerification(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 	if err := service.SendVerificationEmail(u.Email, u.EmailVerifyToken); err != nil {
+		log.Printf("verification email resend failed for %s: %v", u.Email, err)
 		return fiber.NewError(fiber.StatusBadGateway, "gagal mengirim email verifikasi")
 	}
 	return c.JSON(fiber.Map{"ok": true, "message": "Email verifikasi dikirim ulang."})

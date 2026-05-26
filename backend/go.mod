@@ -1,11 +1,11 @@
 module toko/backend
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/jackc/pgx/v5 v5.5.5
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/joho/godotenv v1.5.1
 	golang.org/x/crypto v0.28.0
 	gorm.io/driver/mysql v1.5.7
